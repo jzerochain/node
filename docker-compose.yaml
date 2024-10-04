@@ -27,6 +27,11 @@ services:
     ports:
       - 32302:32302
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
 
   jzero-consensus:
     image: sigp/lighthouse:v5.3.0
@@ -62,3 +67,10 @@ services:
       - 0.0.0.0:9900:9900/udp
       - 0.0.0.0:5502:5502/tcp
       - 0.0.0.0:5502:5502/udp
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
