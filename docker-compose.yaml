@@ -19,13 +19,13 @@ services:
       - --http.vhosts=*
       - --port=32302
       - --verbosity=3
-      - --nodiscover
     volumes:
       - ./data:/datadir
       - ./geth-script.sh:/root/geth-script.sh
       - ./config:/config
     ports:
       - 32302:32302
+      - 8545:8545
     restart: always
     logging:
       driver: "json-file"
