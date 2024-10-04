@@ -1,9 +1,7 @@
-version: "3.8"
 services:
 
-  jbc-execution:
-    container_name: jbc-execution
-    image: ethereum/client-go:v1.13.13
+  jzero-execution:
+    image: ethereum/client-go:v1.14.11
     user: root
     entrypoint: /root/geth-script.sh
     command:
@@ -19,47 +17,48 @@ services:
       - --http.port=8545
       - --http.corsdomain=*
       - --http.vhosts=*
+      - --port=32302
+      - --verbosity=3
+      - --nodiscover
     volumes:
-      - ./genesis.json:/genesis.json
       - ./data:/datadir
       - ./geth-script.sh:/root/geth-script.sh
       - ./config:/config
     ports:
-      - 30303:30303
-      - 8545:8545
+      - 32302:32302
     restart: always
 
-  jbc-consensus:
-    container_name: jbc-consensus
-    image: sigp/lighthouse:v5.0.0
+  jzero-consensus:
+    image: sigp/lighthouse:v5.3.0
     user: root
     entrypoint: /root/lighthouse-script.sh
+    depends_on:
+      - jzero-execution
     command:
       - lighthouse
       - beacon
-      - --execution-endpoint=http://jbc-execution:8551
+      - --execution-endpoint=http://jzero-execution:8551
       - --execution-jwt=/config/jwt.hex
       - --testnet-dir=/config
       - --http-allow-sync-stalled
       - --disable-peer-scoring
       - --http
       - --http-address=0.0.0.0
-      - --http-port=5002
+      - --http-port=5502
       - --disable-packet-filter
-      - --eth1
       - --target-peers=${TARGET_PEERS}
       - --enr-address=${NODE_PUBLIC_IP}
-      - --enr-udp-port=9100
-      - --enr-tcp-port=9100
-      - --port=9100
-      - --checkpoint-sync-url=https://metrabyte-cl.jibchain.net/
+      - --enr-udp-port=9900
+      - --enr-tcp-port=9900
+      - --port=9900
+      - --disable-enr-auto-update
       - --prune-blobs=false
     volumes:
       - ./data/lighthouse:/root/.lighthouse
       - ./config:/config
       - ./lighthouse-script.sh:/root/lighthouse-script.sh
     ports:
-      - 0.0.0.0:9100:9100/tcp
-      - 0.0.0.0:9100:9100/udp
-      - 0.0.0.0:5002:5002/tcp
-      - 0.0.0.0:5002:5002/udp
+      - 0.0.0.0:9900:9900/tcp
+      - 0.0.0.0:9900:9900/udp
+      - 0.0.0.0:5502:5502/tcp
+      - 0.0.0.0:5502:5502/udp
